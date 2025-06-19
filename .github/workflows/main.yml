@@ -49,7 +49,7 @@ jobs:
             - name : Run challenge
               run : |
                 c
-                chmod +x challenge/functions.sh challenge/test.sh
+                chmod +x challenge/test.sh
 
                 echo "Running Cotonou Lightning Bootcamp challenge"
                 if challenge/test.sh > treasure_hunt.log 2>&1; then
