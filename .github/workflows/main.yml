@@ -1,0 +1,66 @@
+name: Run Setup script 
+
+on: 
+    push :
+        branches: 
+            - main
+
+jobs: 
+    bitcoin-setup: 
+        runs-on: ubuntu-latest
+
+        steps: 
+            - name: Verify repository
+              uses: actions/checkout@v4
+            
+            - name : cache Bitcoin core
+              id: cache-bitcoin
+              uses: actions/cache@v3
+              with :
+                path : |
+                    bitcoin-28.0
+                    bitcoin-28.0-x86_64-linux-gnu.tar.gz
+                key: bitcoin-core-28.0
+
+            - name: Setup Bitcoin Core
+              run : |
+                if [ "${{ steps.cache-bitcoin.outputs.cache-hit }}" != 'true' ]; then
+                    wget https://bitcoincore.org/bin/bitcoin-core-28.0/bitcoin-28.0-x86_64-linux-gnu.tar.gz
+                    tar -xzvf bitcoin-28.0-x86_64-linux-gnu.tar.gz
+                fi 
+                sudo bash .github/setup.sh
+            
+            - name : Start bitcoin daemon in regtest
+              run : |
+                bitcoind -regtest -daemon
+                echo "Starting Bitcoin Core in Regtest"
+
+                # Wait bitcoind for 30s max
+
+                for i in {1..30}; do
+                    if bitcoin-cli -regtest getblockchaininfo > /dev/null 2>&1; then 
+                        echo "✅ bitcoind is ready :)"
+                        break
+                    fi
+                    echo "Waiting for bitcoind starts"
+                    sleep 1
+                done
+
+            - name : Run challenge
+              run : |
+                chmod +x challenge/test.sh
+
+                echo "Running Cotonou Lightning Bootcamp challenge"
+                if challenge/test.sh > treasure_hunt.log 2>&1; then
+                    echo "✅ Challenge completed !"
+
+                    echo "### SUMMARY ###"
+                    tail -n 10 treasure_hunt.log
+                    echo  "-----------------------------------------"
+                else
+                    echo "❌ Failure with exit code $?"
+                    cat treasure_hunt.log
+                    exit 1
+                fi
+
+
