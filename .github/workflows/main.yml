@@ -54,7 +54,7 @@ jobs:
                 sudo apt-get update && sudo apt-get install -y jq && sudo apt-get install -y bc
                 
                 echo "Running Cotonou Lightning Bootcamp challenge"
-                if challenge/test.sh > treasure_hunt.log 2>&1; then
+                if bash challenge/test.sh > treasure_hunt.log 2>&1; then
                     echo "✅ Challenge completed !"
 
                     echo "### SUMMARY ###"
