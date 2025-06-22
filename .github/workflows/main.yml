@@ -58,7 +58,7 @@ jobs:
                     echo "✅ Challenge completed !"
 
                     echo "### SUMMARY ###"
-                    tail -f treasure_hunt.log
+                    cat treasure_hunt.log
                     echo  "-----------------------------------------"
                 else
                     echo "❌ Failure with exit code $?"
