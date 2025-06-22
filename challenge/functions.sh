@@ -18,9 +18,9 @@ format_json() {
 mine_blocks() {
   local num_blocks=$1
   local address=$2
-  echo "Generating $num_blocks blocks to $address..."
+  echo "Envoi de la récompense du minage de $num_blocks blocs à $address..."
   result=$(bitcoin-cli -regtest generatetoaddress $num_blocks $address)
-  echo "Mined blocks: $(echo $result | tr -d '[]"' | cut -c 1-10)... (truncated)"
+  echo "Blocs minés: $(echo $result | tr -d '[]"' | cut -c 1-10)... (truncated)"
   # Wait a moment for blocks to be processed
   sleep 1
 }
@@ -29,7 +29,7 @@ mine_blocks() {
 show_wallet_info() {
   local wallet=$1
   echo "=============== WALLET INFO for $wallet ==============="
-  info=$(bitcoin-cli -regtest -rpcwallet=$wallet getwalletinfo)
+  info=$(bitcoin-cli -regtest  -rpcwallet=$wallet getwalletinfo)
   echo "Balance: $(echo $info | grep -o '"balance":[^,]*' | cut -d':' -f2) BTC"
   echo "TX Count: $(echo $info | grep -o '"txcount":[^,]*' | cut -d':' -f2)"
   echo "======================================================="
@@ -37,17 +37,20 @@ show_wallet_info() {
 
 # Helper function to prepare the challenge scenario
 setup_challenge() {
-  echo "Setting up scenario: A Bitcoin treasure hunt..."
-  echo "You've found a series of clues that lead to hidden bitcoin funds."
-  echo "Each clue will require you to use Bitcoin Core commands to reveal the next step."
-  echo "First, you'll need to create a wallet to track your discoveries."
+  echo "Mise en place du Scenario..."
+  echo "Vous allez participer à une chasse au trésor dans le monde de Bitcoin !"
+  echo "Votre objectif est de découvrir des trésors cachés en utilisant les commandes de Bitcoin Core."
+  echo "Vous devrez créer un portefeuille pour suivre vos découvertes et collecter des fonds."
+  
   echo ""
+
+  sleep 1
 }
 
 # Helper function to check for command success
 check_cmd() {
   if [ $? -ne 0 ]; then
-    echo "ERROR: $1 command failed!"
+    echo " ❌ ERROR: $1 commande échouée ! Veuillez vérifier votre commande."
     exit 1
   fi
 }
@@ -64,7 +67,7 @@ ensure_wallet_available() {
   fi
 
   # Try to load the wallet
-  if bitcoin-cli -regtest loadwallet "$wallet_name" 2>/dev/null; then
+  if bitcoin-cli -regtest  loadwallet "$wallet_name" 2>/dev/null; then
     echo "Loaded existing wallet '$wallet_name'."
     return 0
   fi
@@ -72,9 +75,9 @@ ensure_wallet_available() {
   # If loading failed, create the wallet
   echo "Creating new wallet '$wallet_name'..."
   if [ "$is_watch_only" = "true" ]; then
-    bitcoin-cli -regtest createwallet "$wallet_name" true false "" false false
+    bitcoin-cli -regtest  createwallet "$wallet_name" true false "" false false
   else
-    bitcoin-cli -regtest createwallet "$wallet_name"
+    bitcoin-cli -regtest  createwallet "$wallet_name"
   fi
 
   if [ $? -eq 0 ]; then
@@ -86,7 +89,7 @@ ensure_wallet_available() {
   fi
 }
 
-# Helper function to send funds with explicit fee handling for regtest
+# Helper function to send funds with explicit fee handling for signet
 send_with_fee() {
   local from_wallet=$1
   local to_address=$2
@@ -95,12 +98,12 @@ send_with_fee() {
   
   echo "Sending $amount BTC from $from_wallet to $to_address..."
   
-  # Use settxfee to set a reasonable fee for regtest
-  bitcoin-cli -regtest -rpcwallet=$from_wallet settxfee 0.00001
+  # Use settxfee to set a reasonable fee for signet
+  bitcoin-cli -regtest  -rpcwallet=$from_wallet settxfee 0.00001
   check_cmd "Setting transaction fee"
   
   # Send the transaction
-  local txid=$(bitcoin-cli -regtest -rpcwallet=$from_wallet sendtoaddress "$to_address" "$amount" "$comment")
+  local txid=$(bitcoin-cli -regtest  -rpcwallet=$from_wallet sendtoaddress "$to_address" "$amount" "$comment")
   check_cmd "Sending transaction"
   
   echo "Transaction sent! TXID: ${txid:0:16}... (truncated)"
