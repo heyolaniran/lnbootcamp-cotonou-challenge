@@ -169,18 +169,21 @@ echo "La valeur de la première sortie est de $FIRST_OUTPUT_VALUE BTC"
 # ECRIVEZ VOTRE SOLUTION SUR LA LIGNE CI-DESSOUS
 SECOND_OUTPUT_ADDRESS=$()
 
+
 check_cmd "Adresse de la deuxième sortie"
+
+if [[ "$SECOND_OUTPUT_ADDRESS" =~ ^bcrt1[ac-hj-np-z02-9]{8,87}$ ]]; then
+    echo "✅ Adresse bien formatée !"
+else
+    echo "❌ Votre adresse n'est pas valide."
+    exit 1
+fi
 echo "La deuxième sortie a été envoyée à l'adresse : $SECOND_OUTPUT_ADDRESS"
 
 ## Construisez une transaction qui envoie 2100000 satoshis à cette adresse : 2MvLcssW49n9atmksjwg2ZCMsEMsoj3pzUP
 
 # ECRIVEZ VOTRE SOLUTION SUR LA LIGNE CI-DESSOUS
-RAW_TX_DECODED=$()
 
-RAW_TXID=$(echo "$RAW_TX_DECODED" | jq -r '.txid')
-
-VOUT_1=$(echo "$RAW_TX_DECODED" | jq -r '.vout[0].n')
-VOUT_2=$(echo "$RAW_TX_DECODED" | jq -r '.vout[1].n')
 TX=$()
 
 
